@@ -1,0 +1,26 @@
+services:
+  database:
+    image: postgres
+    environment:
+      POSTGRES_USER: manager
+      POSTGRES_PASSWORD: devpassword
+      POSTGRES_DB: event_member_management
+    ports:
+      - target: 5432
+        published: 5432
+    volumes:
+      - type: volume
+        source: data
+        target: /var/lib/postgresql/data
+
+  db_ui:
+    image: adminer
+    ports:
+      - target: 8080
+        published: 8000
+    environment:
+      ADMINER_DEFAULT_SERVER: database
+      ADMINER_DESIGN: dracula
+
+volumes:
+  data:
