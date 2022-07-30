@@ -8,6 +8,8 @@ import org.codeseoul.event_member_management.series.Series;
 import org.codeseoul.event_member_management.series.SeriesRepository;
 import org.codeseoul.event_member_management.sns_service.SnsService;
 import org.codeseoul.event_member_management.sns_service.SnsServiceRepository;
+import org.codeseoul.event_member_management.venue.Venue;
+import org.codeseoul.event_member_management.venue.VenueRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -26,7 +28,8 @@ class LoadDatabase {
             EventRepository eventRepository,
             SeriesRepository seriesRepository,
             SnsServiceRepository snsServiceRepository,
-            RsvpStateRepository rsvpStateRepository
+            RsvpStateRepository rsvpStateRepository,
+            VenueRepository venueRepository
     ) {
 
         return args -> {
@@ -75,6 +78,14 @@ class LoadDatabase {
             )));
             log.info("Preloading " + rsvpStateRepository.save(new RsvpState(
                     "attended"
+            )));
+            log.info("Preloading " + venueRepository.save(new Venue(
+                    "WCoding",
+                    "서울 영등포구 선유로49길 23 11층 1101호",
+                    "https://naver.me/FiLsgFXq",
+                    "",
+                    "https://place.map.kakao.com/1096784914",
+                    "https://g.page/Wcoding?share"
             )));
         };
     }
