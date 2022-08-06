@@ -2,20 +2,17 @@ package org.codeseoul.event_member_management.venue;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.codeseoul.event_member_management.common.Auditable;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
 @NoArgsConstructor
 @Data
-public class Venue {
+public class Venue extends Auditable {
     private @Id @GeneratedValue Long id;
     private String name;
     private String address;
@@ -23,14 +20,6 @@ public class Venue {
     private String tmapLink;
     private String kakaoMapsLink;
     private String googleMapsLink;
-
-    @Column(insertable = false, updatable = false)
-    @CreationTimestamp
-    private Timestamp createdAt;
-
-    @Column(insertable = false, updatable = false)
-    @UpdateTimestamp
-    private Timestamp updatedAt;
 
     public Venue(String name, String address, String naverMapsLink, String tmapLink, String kakaoMapsLink, String googleMapsLink) {
         this.name = name;
