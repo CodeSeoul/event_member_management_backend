@@ -1,5 +1,6 @@
 package org.codeseoul.event_member_management.member;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.codeseoul.event_member_management.rsvp.Rsvp;
@@ -9,9 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @NoArgsConstructor
@@ -33,10 +32,11 @@ public class Member {
     private String shortBio;
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-    private Set<Rsvp> rsvps;
+    @JsonManagedReference
+    private Set<Rsvp> rsvps = new HashSet<>();
 
     @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
-    private List<SnsAccount> snsAccounts;
+    private List<SnsAccount> snsAccounts = new ArrayList<>();
 
     @Column(insertable = false, updatable = false)
     @CreationTimestamp
