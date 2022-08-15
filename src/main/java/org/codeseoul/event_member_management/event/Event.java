@@ -1,5 +1,7 @@
 package org.codeseoul.event_member_management.event;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.codeseoul.event_member_management.rsvp.Rsvp;
@@ -9,6 +11,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -26,10 +29,12 @@ public class Event {
     private String onlineLink;
 
     @OneToMany(mappedBy = "event", fetch = FetchType.LAZY)
-    private Set<Rsvp> rsvps;
+    @JsonManagedReference
+    private Set<Rsvp> rsvps = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "series_id")
+    @JsonBackReference
     private Series series;
 
     @Column(insertable = false, updatable = false)

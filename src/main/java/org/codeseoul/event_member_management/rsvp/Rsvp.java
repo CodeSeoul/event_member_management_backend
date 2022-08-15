@@ -1,5 +1,6 @@
 package org.codeseoul.event_member_management.rsvp;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.codeseoul.event_member_management.event.Event;
@@ -22,10 +23,12 @@ public class Rsvp {
 
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "member_id")
+    @JsonBackReference
     private Member member;
 
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "event_id")
+    @JsonBackReference
     private Event event;
 
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
