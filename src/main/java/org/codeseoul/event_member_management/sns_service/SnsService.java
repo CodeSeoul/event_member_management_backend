@@ -2,11 +2,11 @@ package org.codeseoul.event_member_management.sns_service;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.*;
-import java.sql.Timestamp;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.util.Objects;
 
 @Entity
@@ -19,14 +19,6 @@ public class SnsService {
     private String name;
 
     private String iconUrl;
-
-    @Column(insertable = false, updatable = false)
-    @CreationTimestamp
-    private Timestamp createdAt;
-
-    @Column(insertable = false, updatable = false)
-    @UpdateTimestamp
-    private Timestamp updatedAt;
 
     public SnsService(String name, String iconUrl) {
         this.name = name;

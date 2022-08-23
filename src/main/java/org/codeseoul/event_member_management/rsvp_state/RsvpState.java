@@ -2,11 +2,10 @@ package org.codeseoul.event_member_management.rsvp_state;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.*;
-import java.sql.Timestamp;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.util.Objects;
 
 @Entity
@@ -17,14 +16,6 @@ public class RsvpState {
 
     private String state;
 
-    @Column(insertable = false, updatable = false)
-    @CreationTimestamp
-    private Timestamp createdAt;
-
-    @Column(insertable = false, updatable = false)
-    @UpdateTimestamp
-    private Timestamp updatedAt;
-
     public RsvpState(String state) {
         this.state = state;
     }
@@ -33,10 +24,10 @@ public class RsvpState {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof RsvpState state))
+        if (!(o instanceof RsvpState rsvpState))
             return false;
-        return Objects.equals(this.id, state.id)
-                && Objects.equals(this.state, state.state);
+        return Objects.equals(this.id, rsvpState.id)
+                && Objects.equals(this.state, rsvpState.state);
     }
 
     @Override

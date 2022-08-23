@@ -3,22 +3,23 @@ package org.codeseoul.event_member_management.rsvp;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.codeseoul.event_member_management.common.Auditable;
 import org.codeseoul.event_member_management.event.Event;
 import org.codeseoul.event_member_management.member.Member;
 import org.codeseoul.event_member_management.rsvp_state.RsvpState;
-import org.codeseoul.event_member_management.series.Series;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @NoArgsConstructor
 @Data
-public class Rsvp {
+@Table(
+        uniqueConstraints = @UniqueConstraint(
+                columnNames = {"event_id", "member_id"}
+        )
+)
+public class Rsvp extends Auditable {
     private @Id @GeneratedValue Long id;
 
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
@@ -34,14 +35,6 @@ public class Rsvp {
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "state_id")
     private RsvpState state;
-
-    @Column(insertable = false, updatable = false)
-    @CreationTimestamp
-    private Timestamp createdAt;
-
-    @Column(insertable = false, updatable = false)
-    @UpdateTimestamp
-    private Timestamp updatedAt;
 
     public Rsvp(Member member, Event event, RsvpState state) {
         this.member = member;
