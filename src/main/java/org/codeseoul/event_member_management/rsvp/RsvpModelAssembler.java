@@ -11,13 +11,14 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
-public class RsvpModelAssembler implements RepresentationModelAssembler<Rsvp, EntityModel<Rsvp>> {
+public class RsvpModelAssembler implements RepresentationModelAssembler<Rsvp, EntityModel<RsvpReadSchema>> {
 
     @Override
     @NonNull
-    public EntityModel<Rsvp> toModel(@NonNull Rsvp rsvp) {
+    public EntityModel<RsvpReadSchema> toModel(@NonNull Rsvp rsvp) {
 
-        return EntityModel.of(rsvp,
+        RsvpReadSchema rsvpReadSchema = new RsvpReadSchema(rsvp);
+        return EntityModel.of(rsvpReadSchema,
                 linkTo(methodOn(RsvpController.class).one(rsvp.getId())).withSelfRel(),
                 linkTo(methodOn(MemberController.class).one(rsvp.getMember().getId())).withRel("member"),
                 linkTo(methodOn(EventController.class).one(rsvp.getEvent().getId())).withRel("event"));

@@ -2,15 +2,12 @@ package org.codeseoul.event_member_management.sns_account;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.codeseoul.event_member_management.common.Auditable;
 import org.codeseoul.event_member_management.member.Member;
-import org.codeseoul.event_member_management.series.Series;
 import org.codeseoul.event_member_management.sns_service.SnsService;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
@@ -18,10 +15,10 @@ import java.util.Objects;
 @Data
 @Table(
     uniqueConstraints = @UniqueConstraint(
-        columnNames = {"externalId", "sns_service_id"}
+        columnNames = {"external_id", "sns_service_id"}
     )
 )
-public class SnsAccount {
+public class SnsAccount extends Auditable {
     private @Id @GeneratedValue Long id;
 
     @NotNull
@@ -36,14 +33,6 @@ public class SnsAccount {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "sns_service_id")
     private SnsService snsService;
-
-    @Column(insertable = false, updatable = false)
-    @CreationTimestamp
-    private Timestamp createdAt;
-
-    @Column(insertable = false, updatable = false)
-    @UpdateTimestamp
-    private Timestamp updatedAt;
 
     public SnsAccount(Member member, String externalId, SnsService snsService) {
         this.member = member;

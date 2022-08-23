@@ -6,6 +6,9 @@ import org.codeseoul.event_member_management.event.EventRepository;
 import org.codeseoul.event_member_management.member.Member;
 import org.codeseoul.event_member_management.member.MemberNotFoundException;
 import org.codeseoul.event_member_management.member.MemberRepository;
+import org.codeseoul.event_member_management.rsvp_state.RsvpState;
+import org.codeseoul.event_member_management.rsvp_state.RsvpStateNotFoundException;
+import org.codeseoul.event_member_management.rsvp_state.RsvpStateRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.CollectionModel;
@@ -28,22 +31,24 @@ public class RsvpController {
     private final RsvpModelAssembler assembler;
     private final EventRepository eventRepository;
     private final MemberRepository memberRepository;
+    private final RsvpStateRepository rsvpStateRepository;
 
-    RsvpController(RsvpRepository repository, RsvpModelAssembler assembler, EventRepository eventRepository, MemberRepository memberRepository) {
+    RsvpController(RsvpRepository repository, RsvpModelAssembler assembler, EventRepository eventRepository, MemberRepository memberRepository, RsvpStateRepository rsvpStateRepository) {
         this.repository = repository;
         this.assembler = assembler;
         this.eventRepository = eventRepository;
         this.memberRepository = memberRepository;
+        this.rsvpStateRepository = rsvpStateRepository;
     }
 
     @GetMapping("/members/{memberId}/rsvps")
-    CollectionModel<EntityModel<Rsvp>> rsvpsForMember(@PathVariable Long memberId) {
+    CollectionModel<EntityModel<RsvpReadSchema>> rsvpsForMember(@PathVariable Long memberId) {
         Optional<Member> member = memberRepository.findById(memberId);
         if (member.isEmpty()) {
             throw new MemberNotFoundException(memberId);
         }
 
-        List<EntityModel<Rsvp>> rsvps = repository.findRsvpsByMemberId(memberId).stream()
+        List<EntityModel<RsvpReadSchema>> rsvps = repository.findRsvpsByMemberId(memberId).stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
 
@@ -52,13 +57,13 @@ public class RsvpController {
     }
 
     @GetMapping("/event/{eventId}/rsvps")
-    CollectionModel<EntityModel<Rsvp>> rsvpsForEvent(@PathVariable Long eventId) {
+    CollectionModel<EntityModel<RsvpReadSchema>> rsvpsForEvent(@PathVariable Long eventId) {
         Optional<Event> event = eventRepository.findById(eventId);
         if (event.isEmpty()) {
             throw new EventNotFoundException(eventId);
         }
 
-        List<EntityModel<Rsvp>> rsvps = repository.findRsvpsByEventId(eventId).stream()
+        List<EntityModel<RsvpReadSchema>> rsvps = repository.findRsvpsByEventId(eventId).stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
 
@@ -67,7 +72,7 @@ public class RsvpController {
     }
 
     @GetMapping("/rsvps/{id}")
-    public EntityModel<Rsvp> one(@PathVariable Long id) {
+    public EntityModel<RsvpReadSchema> one(@PathVariable Long id) {
         Rsvp rsvp = repository.findById(id)
                 .orElseThrow(() -> new RsvpNotFoundException(id));
         return assembler.toModel(rsvp);
@@ -75,12 +80,28 @@ public class RsvpController {
 
     // TODO: remove member part when auth is set up
     @PostMapping("/event/{eventId}/member/{memberId}/rsvp")
-    EntityModel<Rsvp> newRsvp(@RequestBody Rsvp newRsvp) {
-        return assembler.toModel(repository.save(newRsvp));
+    EntityModel<RsvpReadSchema> newRsvp(@PathVariable Long eventId, @PathVariable Long memberId, @RequestBody RsvpStateSchema stateSchema) {
+        Optional<Event> event = eventRepository.findById(eventId);
+        if (event.isEmpty()) {
+            throw new EventNotFoundException(eventId);
+        }
+
+        Optional<Member> member = memberRepository.findById(memberId);
+        if (member.isEmpty()) {
+            throw new MemberNotFoundException(memberId);
+        }
+
+        Optional<RsvpState> state = rsvpStateRepository.findById(stateSchema.getStateId());
+        if (state.isEmpty()) {
+            throw new RsvpStateNotFoundException(stateSchema.getStateId());
+        }
+
+        Rsvp rsvp = new Rsvp(member.get(), event.get(), state.get());
+        return assembler.toModel(repository.save(rsvp));
     }
 
     @PutMapping("/rsvps/{id}")
-    EntityModel<Rsvp> replaceMember(@RequestBody Rsvp rsvp, @PathVariable Long id) {
+    EntityModel<RsvpReadSchema> replaceMember(@RequestBody Rsvp rsvp, @PathVariable Long id) {
 
         return repository.findById(id)
                 .map(dbRsvp -> {

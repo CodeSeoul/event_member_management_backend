@@ -4,10 +4,9 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.codeseoul.event_member_management.common.Auditable;
 import org.codeseoul.event_member_management.rsvp.Rsvp;
 import org.codeseoul.event_member_management.series.Series;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -18,7 +17,7 @@ import java.util.Set;
 @Entity
 @NoArgsConstructor
 @Data
-public class Event {
+public class Event extends Auditable {
     private @Id @GeneratedValue Long id;
     private String title;
     private String description;
@@ -36,14 +35,6 @@ public class Event {
     @JoinColumn(name = "series_id")
     @JsonBackReference
     private Series series;
-
-    @Column(insertable = false, updatable = false)
-    @CreationTimestamp
-    private Timestamp createdAt;
-
-    @Column(insertable = false, updatable = false)
-    @UpdateTimestamp
-    private Timestamp updatedAt;
 
     public Event(String title, String description, Timestamp startTimestamp, Integer durationMinutes, String imageUrl, String venue, String onlineLink, Series series) {
         this.title = title;
