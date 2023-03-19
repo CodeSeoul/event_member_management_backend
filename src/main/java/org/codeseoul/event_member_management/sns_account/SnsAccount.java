@@ -15,7 +15,7 @@ import java.util.Objects;
 @Data
 @Table(
     uniqueConstraints = @UniqueConstraint(
-        columnNames = {"external_id", "sns_service_id"}
+        columnNames = {"externalId", "snsServiceId"}
     )
 )
 public class SnsAccount extends Auditable {
@@ -23,7 +23,7 @@ public class SnsAccount extends Auditable {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "memberId")
     private Member member;
 
     @NotNull
@@ -31,7 +31,7 @@ public class SnsAccount extends Auditable {
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "sns_service_id")
+    @JoinColumn(name = "snsServiceId")
     private SnsService snsService;
 
     public SnsAccount(Member member, String externalId, SnsService snsService) {

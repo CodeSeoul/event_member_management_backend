@@ -12,6 +12,8 @@ services:
       - type: volume
         source: data
         target: /var/lib/postgresql/data
+    networks:
+      - emmb
 
   db_ui:
     image: adminer
@@ -21,6 +23,13 @@ services:
     environment:
       ADMINER_DEFAULT_SERVER: database
       ADMINER_DESIGN: dracula
+    networks:
+      - emmb
+
+
+networks:
+  emmb:
+    driver: bridge
 
 volumes:
   data:

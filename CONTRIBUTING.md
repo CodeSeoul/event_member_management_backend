@@ -40,10 +40,10 @@ Please note we have a code of conduct, please follow it in all your interactions
    - [Windows](https://docs.docker.com/docker-for-windows/install/)
    - [Mac](https://docs.docker.com/docker-for-mac/install/)
    - [Linux](https://docs.docker.com/engine/install/#server)
-3. Run `./gradlew composeUp`
-   - This creates and runs a PostgreSQL server and an Adminer web UI in containers via docker-compose.yml
-4. Run `./gradlew bootRun` to build the project
-   - Note that this will automatically load some data into the database.
+3. Run `docker-compose up -d` to run the database and admin UI in the background.
+   - You can access the DB UI at [http://localhost:8000/](http://localhost:8000/)
+4. Run `./gradlew bootRun --args='--spring.profiles.active=local'` to build the project and run the profile with the `local profile`.
+   - Note that this will automatically load some data into the database. You'll want to clean the database between runs.
 5. Check the API via [http://localhost:8080/docs](http://localhost:8080/docs) using the Swagger console.
 
 ### Pull Request Process
