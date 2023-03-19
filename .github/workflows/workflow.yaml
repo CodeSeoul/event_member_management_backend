@@ -72,7 +72,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build-jar
-          path: ./build/libs/event_member_management.jar
+          path: ./build/libs
       - name: Login to Github Container Registry
         uses: docker/login-action@v2
         with:
