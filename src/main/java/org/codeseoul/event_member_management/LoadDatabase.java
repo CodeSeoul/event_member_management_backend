@@ -17,8 +17,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.Example;
 
 import java.sql.Timestamp;
+import java.util.Optional;
 
 @Configuration
 @EnableConfigurationProperties(AppProperties.class)
@@ -37,6 +39,12 @@ class LoadDatabase {
     ) {
 
         return args -> {
+
+            Example<Series> exampleSeries = Example.of(new Series("New Series"));
+            Optional<Series> seriesExistenceCheck = seriesRepository.findOne(exampleSeries);
+            if (seriesExistenceCheck.isPresent()) {
+                return;
+            }
 
             Series newSeries = seriesRepository.save(new Series(
                     "New Series"
