@@ -82,4 +82,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ghcr.io/CodeSeoul/event_member_management_backend:latest
+          tags: ghcr.io/codeseoul/event_member_management_backend:latest
