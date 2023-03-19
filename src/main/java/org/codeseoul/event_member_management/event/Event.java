@@ -28,12 +28,12 @@ public class Event extends Auditable {
     private String onlineLink;
 
     @OneToMany(mappedBy = "event", fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @JsonManagedReference(value="rsvp-event")
     private Set<Rsvp> rsvps = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "series_id")
-    @JsonBackReference
+    @JsonBackReference("event-series")
     private Series series;
 
     public Event(String title, String description, Timestamp startTimestamp, Integer durationMinutes, String imageUrl, String venue, String onlineLink, Series series) {
