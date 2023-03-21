@@ -29,7 +29,7 @@ public class Member extends Auditable {
     private String shortBio;
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @JsonManagedReference(value="rsvp-member")
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Set<Rsvp> rsvps = new HashSet<>();
 

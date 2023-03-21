@@ -1,15 +1,14 @@
-# Thanks to https://codefresh.io/docs/docs/learn-by-example/java/gradle/
-FROM gradle:jdk17-alpine AS build
-COPY --chown=gradle:gradle . /home/gradle/src
-WORKDIR /home/gradle/src
-RUN gradle build --no-daemon
-
-FROM openjdk:17-jre-slim
+FROM eclipse-temurin:17-alpine
 
 EXPOSE 8080
 
+ENV DATABASE_HOST="postgres"
+ENV DATABASE_USERNAME="manager"
+ENV DATABASE_PASSWORD="devpassword"
+ENV DATABASE_PORT=5432
+
 RUN mkdir /app
 
-COPY --from=build /home/gradle/src/build/libs/*.jar /app/spring-boot-application.jar
+COPY ./build/libs/event_member_management*.jar /app/event_member_management.jar
 
-ENTRYPOINT ["java", "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCGroupMemoryLimitForHeap", "-Djava.security.egd=file:/dev/./urandom","-jar","/app/spring-boot-application.jar"]
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app/event_member_management.jar"]

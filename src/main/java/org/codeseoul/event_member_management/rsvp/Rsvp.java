@@ -24,12 +24,12 @@ public class Rsvp extends Auditable {
 
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "member_id")
-    @JsonBackReference
+    @JsonBackReference(value="rsvp-member")
     private Member member;
 
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "event_id")
-    @JsonBackReference
+    @JsonBackReference(value="rsvp-event")
     private Event event;
 
     @ManyToOne(optional = false, fetch = FetchType.EAGER)

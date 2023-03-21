@@ -19,7 +19,7 @@ public class Series extends Auditable {
     private String name;
 
     @OneToMany(mappedBy = "series", fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @JsonManagedReference(value="event-series")
     private List<Event> events = new ArrayList<>();
 
     public Series(String name) {

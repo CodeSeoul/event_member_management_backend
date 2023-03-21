@@ -2,7 +2,6 @@ plugins {
 	id 'org.springframework.boot' version '2.7.0'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'org.asciidoctor.convert' version '1.5.8'
-	id 'com.avast.gradle.docker-compose' version '0.16.4'
 	id 'java'
 }
 
@@ -24,10 +23,6 @@ ext {
 	set('snippetsDir', file("build/generated-snippets"))
 }
 
-apply plugin: 'docker-compose'
-
-dockerCompose.isRequiredBy(test)
-
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
@@ -48,12 +43,13 @@ dependencies {
 	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.restdocs:spring-restdocs-webtestclient'
 //	testImplementation 'org.springframework.security:spring-security-test'
 }
 
-tasks.named('test') {
+tasks.withType(Test).configureEach {
 	outputs.dir snippetsDir
 	useJUnitPlatform()
 }
@@ -61,4 +57,8 @@ tasks.named('test') {
 tasks.named('asciidoctor') {
 	inputs.dir snippetsDir
 	dependsOn test
+}
+
+tasks.named('compileJava') {
+	inputs.files(tasks.named('processResources'))
 }
