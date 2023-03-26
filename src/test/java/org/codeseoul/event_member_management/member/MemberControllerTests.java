@@ -30,92 +30,92 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @SpringBootTest
 @AutoConfigureMockMvc
 public class MemberControllerTests {
-	@Autowired
-	private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-	@Autowired
-	private ObjectMapper mapper;
+    @Autowired
+    private ObjectMapper mapper;
 
-	@MockBean
-	private MemberRepository memberRepository;
+    @MockBean
+    private MemberRepository memberRepository;
 
-	Member aMember;
+    Member aMember;
 
-	@BeforeEach
-	public void setUp() {
-		aMember = new Member();
+    @BeforeEach
+    public void setUp() {
+        aMember = new Member();
         aMember.setUsername("aMemberUsername");
-	}
+    }
 
-	@Test
-	public void findsAllMembers() throws Exception {
+    @Test
+    public void findsAllMembers() throws Exception {
         Member anotherMember = new Member();
         anotherMember.setUsername("anotherMemberUsername");
-		List<Member> members = new ArrayList<>();
-		members.add(aMember);
+        List<Member> members = new ArrayList<>();
+        members.add(aMember);
         members.add(anotherMember);
-		when(memberRepository.findAll()).thenReturn(members);
+        when(memberRepository.findAll()).thenReturn(members);
 
-		mockMvc.perform(get("/members"))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$._embedded.members", hasSize(2)))
-			.andExpect(jsonPath("$._embedded.members[0].username", is(aMember.getUsername())))
+        mockMvc.perform(get("/members"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.members", hasSize(2)))
+            .andExpect(jsonPath("$._embedded.members[0].username", is(aMember.getUsername())))
             .andExpect(jsonPath("$._embedded.members[1].username", is(anotherMember.getUsername())));
-	}
+    }
 
     @Test
-	public void findsAMemberById() throws Exception {
+    public void findsAMemberById() throws Exception {
         aMember.setId((long) 1);
-		when(memberRepository.findById(aMember.getId())).thenReturn(Optional.of(aMember));
+        when(memberRepository.findById(aMember.getId())).thenReturn(Optional.of(aMember));
 
-		mockMvc.perform(get("/members/1"))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.username", is(aMember.getUsername())));
-	}
+        mockMvc.perform(get("/members/1"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.username", is(aMember.getUsername())));
+    }
 
     @Test
-	public void returnsNotFoundWhenMemberNotFound() throws Exception {
+    public void returnsNotFoundWhenMemberNotFound() throws Exception {
         aMember.setId((long) 1);
-		when(memberRepository.findById(aMember.getId())).thenReturn(Optional.empty());
+        when(memberRepository.findById(aMember.getId())).thenReturn(Optional.empty());
 
-		mockMvc.perform(get("/members/1"))
-			.andExpect(status().isNotFound());
-	}
+        mockMvc.perform(get("/members/1"))
+            .andExpect(status().isNotFound());
+    }
 
-	@Test
-	public void savesAMember() throws Exception {
-		when(memberRepository.save(aMember)).thenReturn(aMember);
+    @Test
+    public void savesAMember() throws Exception {
+        when(memberRepository.save(aMember)).thenReturn(aMember);
 
         mockMvc.perform(post("/members")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(aMember)))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.username", is(aMember.getUsername())));
-	}
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.username", is(aMember.getUsername())));
+    }
 
     @Test
-	public void updatesAMember() throws Exception {
+    public void updatesAMember() throws Exception {
         Member anUpdatedMember = new Member();
         anUpdatedMember.setId((long) 1);
         anUpdatedMember.setUsername("newMemberUsername");
         when(memberRepository.findById(aMember.getId())).thenReturn(Optional.of(aMember));
-		when(memberRepository.save(anUpdatedMember)).thenReturn(anUpdatedMember);
-		
+        when(memberRepository.save(anUpdatedMember)).thenReturn(anUpdatedMember);
+        
         mockMvc.perform(put("/members/1")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(anUpdatedMember)))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.username", is(anUpdatedMember.getUsername())));
-	}
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.username", is(anUpdatedMember.getUsername())));
+    }
 
-	@Test
-	public void deletesAMember() throws Exception {
-		aMember.setId((long) 1);
+    @Test
+    public void deletesAMember() throws Exception {
+        aMember.setId((long) 1);
 
-		mockMvc.perform(delete("/members/1"))
-			.andExpect(status().isOk());
-		verify(memberRepository).deleteById(aMember.getId());
-	}  
+        mockMvc.perform(delete("/members/1"))
+            .andExpect(status().isOk());
+        verify(memberRepository).deleteById(aMember.getId());
+    }  
 }
