@@ -20,13 +20,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-// import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-// @Transactional
 public class MemberRestIntegrationTests {
     @Autowired
     private MockMvc mockMvc;
@@ -43,7 +41,7 @@ public class MemberRestIntegrationTests {
     public void setUp() {
         aMember = new Member();
         aMember.setUsername("username");
-        memberRepository.save(aMember);
+        memberRepository.saveAndFlush(aMember);
     }
 
     @AfterEach
@@ -55,7 +53,7 @@ public class MemberRestIntegrationTests {
     public void findsAllMembers() throws Exception {
         Member anotherMember = new Member();
         anotherMember.setUsername("anotherMemberUsername");
-        memberRepository.save(anotherMember);
+        memberRepository.saveAndFlush(anotherMember);
         List<Member> members = new ArrayList<>();
         members.add(aMember);
         members.add(anotherMember);
