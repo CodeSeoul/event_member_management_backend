@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ public class MemberRestIntegrationTests {
     public void setUp() {
         aMember = new Member();
         aMember.setUsername("username");
+        aMember.setEmail("example@email.com");
         memberRepository.saveAndFlush(aMember);
     }
 
@@ -92,19 +94,32 @@ public class MemberRestIntegrationTests {
     }
 
     @Test
-    public void updatesAMember() throws Exception {
-        aMember.setUsername("aNewUsername");
-        mockMvc.perform(put("/members/1")
+    public void updatesAnExistingMember() throws Exception {
+        aMember.setEmail("newExample@email.com");
+        mockMvc.perform(put(String.format("/members/%d", aMember.getId()))
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(aMember)))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.username", is(aMember.getUsername())));
+            .andExpect(jsonPath("$.email", is(aMember.getEmail())));
+    }
+
+    @Test
+    public void createsANewMemberWhenIdNotFound() throws Exception {
+        Member anotherMember = new Member();
+        anotherMember.setUsername("anotherMemberUsername");
+
+        mockMvc.perform(put(String.format("/members/%d", aMember.getId()+1))
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .content(mapper.writeValueAsString(anotherMember)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.username", is(anotherMember.getUsername())));
     }
 
     @Test
     public void deletesAMember() throws Exception {
-        mockMvc.perform(get(String.format("/members/%d", aMember.getId())))
+        mockMvc.perform(delete(String.format("/members/%d", aMember.getId())))
             .andExpect(status().isOk());
     }  
 }
