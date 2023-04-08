@@ -29,12 +29,14 @@ public class Member extends Auditable {
     private String displayName;
 
     @Email
+    @NotBlank
     @Column(unique = true)
     private String email;
 
     @NotBlank
     @Column(unique = true)
     private String phoneNumber;
+    
     private String imageUrl;
     private String shortBio;
 
