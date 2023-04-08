@@ -43,6 +43,7 @@ public class MemberRestIntegrationTests {
         aMember = new Member();
         aMember.setUsername("username");
         aMember.setEmail("example@email.com");
+        aMember.setPhoneNumber("01234567890");
         memberRepository.saveAndFlush(aMember);
     }
 
@@ -51,10 +52,17 @@ public class MemberRestIntegrationTests {
         memberRepository.deleteAll();
     }
 
+    private Member createAnotherMember() {
+        Member anotherMember = new Member();
+        anotherMember.setUsername("anotherUsername");
+        anotherMember.setEmail("anotherEmail@example.com");
+        anotherMember.setPhoneNumber("0345678901");
+        return anotherMember;
+    }
+
     @Test
     public void findsAllMembers() throws Exception {
-        Member anotherMember = new Member();
-        anotherMember.setUsername("anotherMemberUsername");
+        Member anotherMember = createAnotherMember();
         memberRepository.saveAndFlush(anotherMember);
         List<Member> members = new ArrayList<>();
         members.add(aMember);
@@ -82,98 +90,99 @@ public class MemberRestIntegrationTests {
 
     @Test
     public void savesAMember() throws Exception {
-        Member memberToBeSaved = new Member();
-        memberToBeSaved.setUsername("memberToBeSavedUsename");
+        Member memberToBeSaved = createAnotherMember();
 
         mockMvc.perform(post("/members")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(memberToBeSaved)))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.username", is(memberToBeSaved.getUsername())));
+            .andExpect(jsonPath("$.username", is(memberToBeSaved.getUsername())))
+            .andExpect(jsonPath("$.email", is(memberToBeSaved.getEmail())))
+            .andExpect(jsonPath("$.phoneNumber", is(memberToBeSaved.getPhoneNumber())));
     }
 
     @Test
-    public void returnsBadRequestErrorWhenSavingMemberWithBlankUsername() throws Exception {
+    public void returnsBadRequestWhenSavingInvalidMember() throws Exception {
         Member memberToBeSaved = new Member();
         memberToBeSaved.setUsername("");
-
-        mockMvc.perform(post("/members")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-            .content(mapper.writeValueAsString(memberToBeSaved)))
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.username", is("must not be blank")));
-    }
-
-    @Test
-    public void returnsBadRequestrWhenSavingMemberwithInvalidEmail() throws Exception {
-        Member memberToBeSaved = new Member();
-        memberToBeSaved.setUsername("username");
         memberToBeSaved.setEmail("anInvalidEmail");
+        memberToBeSaved.setPhoneNumber("");
 
         mockMvc.perform(post("/members")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(memberToBeSaved)))
             .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.username", is("must not be blank")))
+            .andExpect(jsonPath("$.phoneNumber", is("must not be blank")))
             .andExpect(jsonPath("$.email", is("must be a well-formed email address")));
     }
 
     @Test
-    public void returnsBadRequestErrorWhenSavingMemberwithExistingUsername() throws Exception {
+    public void returnsBadRequestErrorWhenSavingMemberwithExistingUsernameEmailOrPhoneNumber() throws Exception {
         Member memberToBeSaved = new Member();
         memberToBeSaved.setUsername(aMember.getUsername());
+        memberToBeSaved.setEmail(aMember.getEmail());
+        memberToBeSaved.setPhoneNumber(aMember.getPhoneNumber());
 
         mockMvc.perform(post("/members")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(memberToBeSaved)))
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.username", is("username already in use")));
+            .andExpect(jsonPath("$.username", is("username already in use")))
+            .andExpect(jsonPath("$.email", is("email already in use")))
+            .andExpect(jsonPath("$.phoneNumber", is("phoneNumber already in use")));
     }
 
     @Test
     public void updatesAnExistingMemberUsername() throws Exception {
+        mockMvc.perform(put(String.format("/members/%d", aMember.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(aMember)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.username", is(aMember.getUsername())));
+    }
+
+    @Test
+    public void updatesAnExistingMember() throws Exception {
         aMember.setUsername("newUsername");
-        mockMvc.perform(put(String.format("/members/%d", aMember.getId()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(aMember)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.username", is(aMember.getUsername())));
-    }
-
-    @Test
-    public void updatesAnExistingMembersEmail() throws Exception {
         aMember.setEmail("anotherEmail@example.com");
+        aMember.setPhoneNumber("0345678901");
+
         mockMvc.perform(put(String.format("/members/%d", aMember.getId()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(aMember)))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.username", is(aMember.getUsername())));
+            .andExpect(jsonPath("$.username", is(aMember.getUsername())))
+            .andExpect(jsonPath("$.username", is(aMember.getUsername())))
+            .andExpect(jsonPath("$.email", is(aMember.getEmail())));
     }
 
     @Test
-    public void returnsBadRequestErrorWhenUpdatingMemberwithExistingUsername() throws Exception {
-        Member anotherMember = new Member();
-        anotherMember.setUsername("anotherUsername");
+    public void returnsBadRequestErrorWhenUpdatingMemberWithExistingUsernameEmailOrPhoneNumber() throws Exception {
+        Member anotherMember = createAnotherMember();
         memberRepository.saveAndFlush(anotherMember);
         aMember.setUsername(anotherMember.getUsername());
+        aMember.setEmail(anotherMember.getEmail());
+        aMember.setPhoneNumber(anotherMember.getPhoneNumber());
 
         mockMvc.perform(put(String.format("/members/%d", aMember.getId()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(aMember)))
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.username", is("username already in use")));
+            .andExpect(jsonPath("$.username", is("username already in use")))
+            .andExpect(jsonPath("$.email", is("email already in use")))
+            .andExpect(jsonPath("$.phoneNumber", is("phoneNumber already in use")));
     }
 
     @Test
     public void returnsNotFoundErrorWhenUpdatingNonExistingMember() throws Exception {
-        Member anotherMember = new Member();
-        anotherMember.setUsername("anotherMemberUsername");
+        Member anotherMember = createAnotherMember();
         
         mockMvc.perform(put(String.format("/members/%d", aMember.getId()+1))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -189,7 +198,7 @@ public class MemberRestIntegrationTests {
     }  
 
     @Test
-    public void returnsNotFoundErrorWhendeletingNonExistingMember() throws Exception {
+    public void returnsNotFoundErrorWhenDeletingNonExistingMember() throws Exception {
         Long nonExistingMemberId = aMember.getId() + 1;
         mockMvc.perform(delete(String.format("/members/%d", nonExistingMemberId)))
             .andExpect(status().isNotFound());

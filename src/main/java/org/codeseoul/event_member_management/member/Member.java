@@ -32,6 +32,7 @@ public class Member extends Auditable {
     @Column(unique = true)
     private String email;
 
+    @NotBlank
     @Column(unique = true)
     private String phoneNumber;
     private String imageUrl;

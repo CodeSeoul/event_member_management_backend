@@ -86,6 +86,10 @@ public class MemberController {
     private void validateExistingMember(Member oldMember, Member newMember, BindingResult errors) throws MethodArgumentNotValidException {
         if (!oldMember.getUsername().equals(newMember.getUsername()) && repository.findByUsername(newMember.getUsername()).isPresent())
             errors.addError(new FieldError("Member", "username", "username already in use"));
+        if (!oldMember.getEmail().equals(newMember.getEmail()) && repository.findByEmail(newMember.getEmail()).isPresent())
+            errors.addError(new FieldError("Member", "email", "email already in use"));
+        if (!oldMember.getPhoneNumber().equals(newMember.getPhoneNumber()) && repository.findByPhoneNumber(newMember.getPhoneNumber()).isPresent())
+            errors.addError(new FieldError("Member", "phoneNumber", "phoneNumber already in use"));
         if (errors.hasErrors())
             throw new MethodArgumentNotValidException(null, errors);
     }
@@ -93,6 +97,10 @@ public class MemberController {
     private void validateNewMember(Member member, BindingResult errors) throws MethodArgumentNotValidException {
         if (repository.findByUsername(member.getUsername()).isPresent())
             errors.addError(new FieldError("Member", "username", "username already in use"));
+        if (repository.findByEmail(member.getEmail()).isPresent())
+            errors.addError(new FieldError("Member", "email", "email already in use"));
+        if (repository.findByPhoneNumber(member.getPhoneNumber()).isPresent())
+            errors.addError(new FieldError("Member", "phoneNumber", "phoneNumber already in use"));
         if (errors.hasErrors())
             throw new MethodArgumentNotValidException(null, errors);
     }
