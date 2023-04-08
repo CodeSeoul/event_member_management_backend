@@ -75,7 +75,7 @@ public class MemberRestIntegrationTests {
     }
 
     @Test
-    public void returnsNotFoundWhenMemberNotFound() throws Exception {
+    public void returnsNotFoundErrorWhenMemberNotFound() throws Exception {
         mockMvc.perform(get("/members/2"))
             .andExpect(status().isNotFound());
     }
@@ -86,35 +86,89 @@ public class MemberRestIntegrationTests {
         memberToBeSaved.setUsername("memberToBeSavedUsename");
 
         mockMvc.perform(post("/members")
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON)
-            .content(mapper.writeValueAsString(memberToBeSaved)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(memberToBeSaved)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.username", is(memberToBeSaved.getUsername())));
     }
 
     @Test
-    public void updatesAnExistingMember() throws Exception {
-        aMember.setEmail("newExample@email.com");
-        mockMvc.perform(put(String.format("/members/%d", aMember.getId()))
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON)
-            .content(mapper.writeValueAsString(aMember)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.email", is(aMember.getEmail())));
+    public void returnsBadRequestErrorWhenSavingMemberWithBlankUsername() throws Exception {
+        Member memberToBeSaved = new Member();
+        memberToBeSaved.setUsername("");
+
+        mockMvc.perform(post("/members")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+            .content(mapper.writeValueAsString(memberToBeSaved)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.username", is("must not be blank")));
     }
 
     @Test
-    public void createsANewMemberWhenIdNotFound() throws Exception {
+    public void returnsBadRequestrWhenSavingMemberwithInvalidEmail() throws Exception {
+        Member memberToBeSaved = new Member();
+        memberToBeSaved.setUsername("username");
+        memberToBeSaved.setEmail("anInvalidEmail");
+
+        mockMvc.perform(post("/members")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+            .content(mapper.writeValueAsString(memberToBeSaved)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.email", is("must be a well-formed email address")));
+    }
+
+    @Test
+    public void returnsBadRequestErrorWhenSavingMemberwithExistingUsername() throws Exception {
+        Member memberToBeSaved = new Member();
+        memberToBeSaved.setUsername(aMember.getUsername());
+
+        mockMvc.perform(post("/members")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+            .content(mapper.writeValueAsString(memberToBeSaved)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.username", is("username already in use")));
+    }
+
+    @Test
+    public void updatesAnExistingMember() throws Exception {
+        aMember.setUsername("newUsername");
+        mockMvc.perform(put(String.format("/members/%d", aMember.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(aMember)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.username", is(aMember.getUsername())));
+    }
+
+    @Test
+    public void returnsBadRequestErrorWhenUpdatingMemberwithExistingUsername() throws Exception {
+        Member anotherMember = new Member();
+        anotherMember.setUsername("anotherUsername");
+        memberRepository.saveAndFlush(anotherMember);
+        aMember.setUsername(anotherMember.getUsername());
+
+        mockMvc.perform(put(String.format("/members/%d", aMember.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+            .content(mapper.writeValueAsString(aMember)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.username", is("username already in use")));
+    }
+
+    @Test
+    public void returnsNotFoundErrorWhenUpdatingNonExistingMember() throws Exception {
         Member anotherMember = new Member();
         anotherMember.setUsername("anotherMemberUsername");
-
+        
         mockMvc.perform(put(String.format("/members/%d", aMember.getId()+1))
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(anotherMember)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.username", is(anotherMember.getUsername())));
+            .andExpect(status().isNotFound());
     }
 
     @Test
@@ -122,4 +176,11 @@ public class MemberRestIntegrationTests {
         mockMvc.perform(delete(String.format("/members/%d", aMember.getId())))
             .andExpect(status().isOk());
     }  
+
+    @Test
+    public void returnsNotFoundErrorWhendeletingNonExistingMember() throws Exception {
+        Long nonExistingMemberId = aMember.getId() + 1;
+        mockMvc.perform(delete(String.format("/members/%d", nonExistingMemberId)))
+            .andExpect(status().isNotFound());
+    } 
 }

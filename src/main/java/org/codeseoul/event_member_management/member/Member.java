@@ -9,6 +9,9 @@ import org.codeseoul.event_member_management.rsvp.Rsvp;
 import org.codeseoul.event_member_management.sns_account.SnsAccount;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+
 import java.util.*;
 
 @Entity
@@ -18,11 +21,17 @@ public class Member extends Auditable {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private @Id
     @GeneratedValue Long id;
+
+    @NotBlank
     @Column(unique = true)
     private String username;
+
     private String displayName;
+
+    @Email
     @Column(unique = true)
     private String email;
+
     @Column(unique = true)
     private String phoneNumber;
     private String imageUrl;
