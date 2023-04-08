@@ -134,8 +134,19 @@ public class MemberRestIntegrationTests {
     }
 
     @Test
-    public void updatesAnExistingMember() throws Exception {
+    public void updatesAnExistingMemberUsername() throws Exception {
         aMember.setUsername("newUsername");
+        mockMvc.perform(put(String.format("/members/%d", aMember.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(aMember)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.username", is(aMember.getUsername())));
+    }
+
+    @Test
+    public void updatesAnExistingMembersEmail() throws Exception {
+        aMember.setEmail("anotherEmail@example.com");
         mockMvc.perform(put(String.format("/members/%d", aMember.getId()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)

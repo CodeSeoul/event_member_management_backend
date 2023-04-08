@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -45,7 +46,7 @@ public class MemberController {
     // end::get-aggregate-root[]
     @PostMapping("/members")
     EntityModel<Member> newMember(@Valid @RequestBody Member newMember, BindingResult errors) throws MethodArgumentNotValidException {
-        validateMember(newMember, errors);
+        validateNewMember(newMember, errors);
         return assembler.toModel(repository.save(newMember));
     }
 
@@ -58,18 +59,21 @@ public class MemberController {
     }
 
     @PutMapping("/members/{id}")
-    EntityModel<Member> replaceMember(@Valid @RequestBody Member member, @PathVariable Long id, BindingResult errors) throws MethodArgumentNotValidException {
-        validateMember(member, errors);
-        return repository.findById(id)
-            .map(dbMember -> {
-                dbMember.setUsername(member.getUsername());
-                dbMember.setDisplayName(member.getDisplayName());
-                dbMember.setEmail(member.getEmail());
-                dbMember.setPhoneNumber(member.getPhoneNumber());
-                dbMember.setImageUrl(member.getImageUrl());
-                dbMember.setShortBio(member.getShortBio());
-                return assembler.toModel(repository.save(dbMember));
-            }).orElseThrow(() -> new MemberNotFoundException(id));
+    EntityModel<Member> replaceMember(@Valid @RequestBody Member newMember, @PathVariable Long id, BindingResult errors) throws MethodArgumentNotValidException {
+        Optional<Member> dbMember = repository.findById(id);
+        if (dbMember.isPresent()) {
+            Member oldMember = dbMember.get();
+            validateExistingMember(oldMember, newMember, errors);               
+            oldMember.setUsername(newMember.getUsername());
+            oldMember.setDisplayName(newMember.getDisplayName());
+            oldMember.setEmail(newMember.getEmail());
+            oldMember.setPhoneNumber(newMember.getPhoneNumber());
+            oldMember.setImageUrl(newMember.getImageUrl());
+            oldMember.setShortBio(newMember.getShortBio());
+            return assembler.toModel(repository.save(oldMember));
+        } else {
+            throw new MemberNotFoundException(id);
+        }
     }
 
     @DeleteMapping("/members/{id}")
@@ -79,7 +83,14 @@ public class MemberController {
         repository.deleteById(id);
     }
 
-    private void validateMember(Member member, BindingResult errors) throws MethodArgumentNotValidException {
+    private void validateExistingMember(Member oldMember, Member newMember, BindingResult errors) throws MethodArgumentNotValidException {
+        if (!oldMember.getUsername().equals(newMember.getUsername()) && repository.findByUsername(newMember.getUsername()).isPresent())
+            errors.addError(new FieldError("Member", "username", "username already in use"));
+        if (errors.hasErrors())
+            throw new MethodArgumentNotValidException(null, errors);
+    }
+
+    private void validateNewMember(Member member, BindingResult errors) throws MethodArgumentNotValidException {
         if (repository.findByUsername(member.getUsername()).isPresent())
             errors.addError(new FieldError("Member", "username", "username already in use"));
         if (errors.hasErrors())
