@@ -46,7 +46,7 @@ public class MemberController {
     // end::get-aggregate-root[]
     @PostMapping("/members")
     EntityModel<Member> newMember(@Valid @RequestBody Member newMember, BindingResult errors) throws MethodArgumentNotValidException {
-        validateNewMember(newMember, errors);
+        validateMember(newMember, errors);
         return assembler.toModel(repository.save(newMember));
     }
 
@@ -62,8 +62,9 @@ public class MemberController {
     EntityModel<Member> replaceMember(@Valid @RequestBody Member newMember, @PathVariable Long id, BindingResult errors) throws MethodArgumentNotValidException {
         Optional<Member> dbMember = repository.findById(id);
         if (dbMember.isPresent()) {
-            Member oldMember = dbMember.get();
-            validateExistingMember(oldMember, newMember, errors);               
+            newMember.setId(id); // 
+            validateMember(newMember, errors);
+            Member oldMember = dbMember.get();           
             oldMember.setUsername(newMember.getUsername());
             oldMember.setDisplayName(newMember.getDisplayName());
             oldMember.setEmail(newMember.getEmail());
@@ -83,24 +84,19 @@ public class MemberController {
         repository.deleteById(id);
     }
 
-    private void validateExistingMember(Member oldMember, Member newMember, BindingResult errors) throws MethodArgumentNotValidException {
-        if (!oldMember.getUsername().equals(newMember.getUsername()) && repository.findByUsername(newMember.getUsername()).isPresent())
-            errors.addError(new FieldError("Member", "username", "username already in use"));
-        if (!oldMember.getEmail().equals(newMember.getEmail()) && repository.findByEmail(newMember.getEmail()).isPresent())
-            errors.addError(new FieldError("Member", "email", "email already in use"));
-        if (!oldMember.getPhoneNumber().equals(newMember.getPhoneNumber()) && repository.findByPhoneNumber(newMember.getPhoneNumber()).isPresent())
-            errors.addError(new FieldError("Member", "phoneNumber", "phoneNumber already in use"));
-        if (errors.hasErrors())
-            throw new MethodArgumentNotValidException(null, errors);
-    }
-
-    private void validateNewMember(Member member, BindingResult errors) throws MethodArgumentNotValidException {
-        if (repository.findByUsername(member.getUsername()).isPresent())
-            errors.addError(new FieldError("Member", "username", "username already in use"));
-        if (repository.findByEmail(member.getEmail()).isPresent())
-            errors.addError(new FieldError("Member", "email", "email already in use"));
-        if (repository.findByPhoneNumber(member.getPhoneNumber()).isPresent())
-            errors.addError(new FieldError("Member", "phoneNumber", "phoneNumber already in use"));
+    private void validateMember(Member member, BindingResult errors) throws MethodArgumentNotValidException {
+        List<Member> members = repository.findByUsernameOrEmailOrPhoneNumber(
+            member.getUsername(), member.getEmail(), member.getPhoneNumber());
+        for (Member otherMember : members) {
+            if (member.getId() != null && member.getId().equals(otherMember.getId()))
+                continue;
+            if (member.getUsername().equals(otherMember.getUsername()))
+                errors.addError(new FieldError("Member", "username", "username already in use"));;    
+            if (member.getEmail().equals(otherMember.getEmail()))
+                errors.addError(new FieldError("Member", "email", "email already in use"));   
+            if (member.getPhoneNumber().equals(otherMember.getPhoneNumber()))
+                errors.addError(new FieldError("Member", "phoneNumber", "phoneNumber already in use"));   
+        }
         if (errors.hasErrors())
             throw new MethodArgumentNotValidException(null, errors);
     }
