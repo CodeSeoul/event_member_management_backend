@@ -1,9 +1,5 @@
 package org.codeseoul.event_member_management.member;
 
-import org.codeseoul.event_member_management.event.Event;
-import org.codeseoul.event_member_management.event.EventController;
-import org.codeseoul.event_member_management.series.Series;
-import org.codeseoul.event_member_management.series.SeriesController;
 import org.codeseoul.event_member_management.sns_account.SnsAccountController;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
