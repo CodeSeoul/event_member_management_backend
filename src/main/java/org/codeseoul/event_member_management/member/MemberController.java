@@ -60,21 +60,11 @@ public class MemberController {
 
     @PutMapping("/members/{id}")
     EntityModel<Member> replaceMember(@Valid @RequestBody Member newMember, @PathVariable Long id, BindingResult errors) throws MethodArgumentNotValidException {
-        Optional<Member> dbMember = repository.findById(id);
-        if (dbMember.isPresent()) {
-            newMember.setId(id); // 
-            validateMember(newMember, errors);
-            Member oldMember = dbMember.get();           
-            oldMember.setUsername(newMember.getUsername());
-            oldMember.setDisplayName(newMember.getDisplayName());
-            oldMember.setEmail(newMember.getEmail());
-            oldMember.setPhoneNumber(newMember.getPhoneNumber());
-            oldMember.setImageUrl(newMember.getImageUrl());
-            oldMember.setShortBio(newMember.getShortBio());
-            return assembler.toModel(repository.save(oldMember));
-        } else {
-            throw new MemberNotFoundException(id);
-        }
+        if (!repository.existsById(id))
+            throw new MemberNotFoundException(id);  
+        newMember.setId(id); // 
+        validateMember(newMember, errors);
+        return assembler.toModel(repository.save(newMember));
     }
 
     @DeleteMapping("/members/{id}")
