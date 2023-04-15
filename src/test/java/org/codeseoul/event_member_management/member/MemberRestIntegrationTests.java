@@ -8,9 +8,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import org.junit.jupiter.api.AfterEach;
@@ -64,9 +61,6 @@ public class MemberRestIntegrationTests {
     public void findsAllMembers() throws Exception {
         Member anotherMember = createAnotherMember();
         memberRepository.saveAndFlush(anotherMember);
-        List<Member> members = new ArrayList<>();
-        members.add(aMember);
-        members.add(anotherMember);
 
         mockMvc.perform(get("/members"))
             .andExpect(status().isOk())
