@@ -55,25 +55,16 @@ public class VenueController {
 
     @PutMapping("/venues/{id}")
     EntityModel<Venue> replaceVenue(@RequestBody Venue newVenue, @PathVariable Long id) {
-
-        return repository.findById(id)
-                .map(Venue -> {
-                    Venue.setName(newVenue.getName());
-                    Venue.setAddress(newVenue.getAddress());
-                    Venue.setNaverMapsLink(newVenue.getNaverMapsLink());
-                    Venue.setTmapLink(newVenue.getTmapLink());
-                    Venue.setKakaoMapsLink(newVenue.getKakaoMapsLink());
-                    Venue.setGoogleMapsLink(newVenue.getGoogleMapsLink());
-                    return assembler.toModel(repository.save(Venue));
-                })
-                .orElseGet(() -> {
-                    newVenue.setId(id);
-                    return assembler.toModel(repository.save(newVenue));
-                });
+        if (!repository.existsById(id))
+            throw new VenueNotFoundException(id);
+        newVenue.setId(id);
+        return assembler.toModel(repository.save(newVenue));
     }
-
+;
     @DeleteMapping("/venues/{id}")
     void deleteVenue(@PathVariable Long id) {
+        if (!repository.existsById(id))
+            throw new VenueNotFoundException(id);
         repository.deleteById(id);
     }
 }
