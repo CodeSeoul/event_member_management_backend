@@ -9,6 +9,7 @@ import org.codeseoul.event_member_management.rsvp.Rsvp;
 import org.codeseoul.event_member_management.series.Series;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Objects;
@@ -19,6 +20,8 @@ import java.util.Set;
 @Data
 public class Event extends Auditable {
     private @Id @GeneratedValue Long id;
+
+    @NotBlank
     private String title;
     private String description;
     private Timestamp startTimestamp;
