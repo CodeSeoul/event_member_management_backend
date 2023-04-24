@@ -74,10 +74,6 @@ public class EventRestIntegrationTests {
         );
     }
 
-    private Series createAnotherSeries() {
-        return new Series("Another Series");
-    }
-
     @Test
     public void savesAnEvent() throws Exception {
         Event eventToBeSaved = createAnotherEvent();
