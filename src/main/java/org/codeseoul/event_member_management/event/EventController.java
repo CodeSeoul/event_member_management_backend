@@ -4,9 +4,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -41,7 +47,7 @@ public class EventController {
     // end::get-aggregate-root[]
 
     @PostMapping("/events")
-    EntityModel<Event> newEvent(@RequestBody Event newEvent) {
+    EntityModel<Event> newEvent(@Valid @RequestBody Event newEvent) {
         return assembler.toModel(repository.save(newEvent));
     }
 
@@ -54,28 +60,29 @@ public class EventController {
     }
 
     @PutMapping("/events/{id}")
-    EntityModel<Event> replaceEvent(@RequestBody Event newEvent, @PathVariable Long id) {
-
-        return repository.findById(id)
-                .map(Event -> {
-                    Event.setTitle(newEvent.getTitle());
-                    Event.setDescription(newEvent.getDescription());
-                    Event.setStartTimestamp(newEvent.getStartTimestamp());
-                    Event.setDurationMinutes(newEvent.getDurationMinutes());
-                    Event.setImageUrl(newEvent.getImageUrl());
-                    Event.setVenue(newEvent.getVenue());
-                    Event.setOnlineLink(newEvent.getOnlineLink());
-                    Event.setSeries(newEvent.getSeries());
-                    return assembler.toModel(repository.save(Event));
-                })
-                .orElseGet(() -> {
-                    newEvent.setId(id);
-                    return assembler.toModel(repository.save(newEvent));
-                });
+    EntityModel<Event> replaceEvent(@Valid @RequestBody Event newEvent, @PathVariable Long id) {
+        if (!repository.existsById(id))
+            throw new EventNotFoundException(id);
+        newEvent.setId(id);
+        return assembler.toModel(repository.save(newEvent));
     }
 
     @DeleteMapping("/events/{id}")
     void deleteEvent(@PathVariable Long id) {
+        if (!repository.existsById(id))
+            throw new EventNotFoundException(id);
         repository.deleteById(id);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
     }
 }
