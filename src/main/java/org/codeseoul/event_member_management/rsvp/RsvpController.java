@@ -108,9 +108,6 @@ public class RsvpController {
                     dbRsvp.setState(rsvp.getState());
                     return assembler.toModel(repository.save(dbRsvp));
                 })
-                .orElseGet(() -> {
-                    rsvp.setId(id);
-                    return assembler.toModel(repository.save(rsvp));
-                });
+                .orElseThrow(() -> new RsvpNotFoundException(id));
     }
 }
