@@ -8,7 +8,7 @@
     },
     {
       "name": "app.cors-allowed-origins",
-      "type": "java.lang.String",
+      "type": "java.lang.String[]",
       "description": "A comma-separated list of origins to allow for CORS."
     }
   ]
