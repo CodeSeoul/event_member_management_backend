@@ -23,7 +23,6 @@ import java.sql.Timestamp;
 import java.util.Optional;
 
 @Configuration
-@EnableConfigurationProperties(AppProperties.class)
 @ConditionalOnProperty(name = "app.seed-database")
 class LoadDatabase {
 
