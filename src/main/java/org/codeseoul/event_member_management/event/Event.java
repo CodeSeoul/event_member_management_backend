@@ -1,4 +1,4 @@
-/* (C) 2023 */
+/* CodeSeoul (C) 2023 */
 package org.codeseoul.event_member_management.event;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;

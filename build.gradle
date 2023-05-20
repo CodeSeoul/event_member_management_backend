@@ -112,6 +112,6 @@ spotless {
 
     formatAnnotations()  // fixes formatting of type annotations, see below
 
-    licenseHeader '/* (C) $YEAR */' // or licenseHeaderFile
+    licenseHeader '/* CodeSeoul (C) $YEAR */' // or licenseHeaderFile
   }
 }
