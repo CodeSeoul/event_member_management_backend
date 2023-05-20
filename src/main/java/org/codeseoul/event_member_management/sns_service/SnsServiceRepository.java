@@ -1,3 +1,4 @@
+/* CodeSeoul (C) 2023 */
 package org.codeseoul.event_member_management.sns_service;
 
 import org.springframework.data.jpa.repository.JpaRepository;
