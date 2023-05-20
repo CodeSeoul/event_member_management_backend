@@ -7,15 +7,15 @@ Adapted from [this CONTRIBUTING.md from PurpleBook](https://gist.github.com/Purp
 ## Table of Contents
 
 - [How to Help](#how-to-help)
-  - [Identifying Opportunities](#identifying-opportunities)
-  - [Pull Request Process](#pull-request-process)
+- [Identifying Opportunities](#identifying-opportunities)
+- [Pull Request Process](#pull-request-process)
 - [Code of Conduct](#code-of-conduct)
-  - [Our Pledge](#our-pledge)
-  - [Our Standards](#our-standards)
-  - [Our Responsibilities](#our-responsibilities)
-  - [Scope](#scope)
-  - [Enforcement](#enforcement)
-  - [Attribution](#attribution)
+- [Our Pledge](#our-pledge)
+- [Our Standards](#our-standards)
+- [Our Responsibilities](#our-responsibilities)
+- [Scope](#scope)
+- [Enforcement](#enforcement)
+- [Attribution](#attribution)
 
 When contributing to this repository, please first discuss the change you wish to make via issue,
 email, or any other method with the owners of this repository before making a change.
@@ -27,7 +27,7 @@ Please note we have a code of conduct, please follow it in all your interactions
 ### Identifying Opportunities
 
 1. Check Issues in this repository.
-   - People new to the project are recommended to find something with a `good first issue` tag.
+- People new to the project are recommended to find something with a `good first issue` tag.
 2. Discuss the issue to find any gaps in requirements or any clarification you need.
 3. Request the issue be assigned to you.
 4. Fork and make some changes!
@@ -37,26 +37,26 @@ Please note we have a code of conduct, please follow it in all your interactions
 
 1. Install [the latest JDK](https://www.oracle.com/java/technologies/downloads/) if you haven't already.
 2. Install Docker for your system
-   - [Windows](https://docs.docker.com/docker-for-windows/install/)
-   - [Mac](https://docs.docker.com/docker-for-mac/install/)
-   - [Linux](https://docs.docker.com/engine/install/#server)
+- [Windows](https://docs.docker.com/docker-for-windows/install/)
+- [Mac](https://docs.docker.com/docker-for-mac/install/)
+- [Linux](https://docs.docker.com/engine/install/#server)
 3. Run `docker-compose up -d` to run the database and admin UI in the background.
-   - You can access the DB UI at [http://localhost:8000/](http://localhost:8000/)
+- You can access the DB UI at [http://localhost:8000/](http://localhost:8000/)
 4. Run `./gradlew bootRun --args='--spring.profiles.active=local'` to build the project and run the profile with the `local profile`.
-   - Note that this will automatically load some data into the database. You'll want to clean the database between runs.
+- Note that this will automatically load some data into the database. You'll want to clean the database between runs.
 5. Check the API via [http://localhost:8080/docs](http://localhost:8080/docs) using the Swagger console.
 
 ### Pull Request Process
 
 1. Ensure any install or build dependencies are removed before the end of the layer when doing a
-   build.
+build.
 2. Update the README.md with details of changes to the interface, this includes new environment
-   variables, exposed ports, useful file locations and container parameters.
+variables, exposed ports, useful file locations and container parameters.
 3. Increase the version numbers in any examples files and the README.md to the new version that this
-   Pull Request would represent. The versioning scheme we use is [SemVer](http://semver.org/).
-   - **Note**: We have not yet released the project, so this step is not yet necessary.
+Pull Request would represent. The versioning scheme we use is [SemVer](http://semver.org/).
+- **Note**: We have not yet released the project, so this step is not yet necessary.
 4. You may merge the Pull Request in once you have the sign-off of two other developers, or if you
-   do not have permission to do that, you may request the second reviewer to merge it for you.
+do not have permission to do that, you may request the second reviewer to merge it for you.
 
 ## Code of Conduct
 
@@ -83,13 +83,13 @@ include:
 Examples of unacceptable behavior by participants include:
 
 - The use of sexualized language or imagery and unwelcome sexual attention or
-  advances
+advances
 - Trolling, insulting/derogatory comments, and personal or political attacks
 - Public or private harassment
 - Publishing others' private information, such as a physical or electronic
-  address, without explicit permission
+address, without explicit permission
 - Other conduct which could reasonably be considered inappropriate in a
-  professional setting
+professional setting
 
 ### Our Responsibilities
 
