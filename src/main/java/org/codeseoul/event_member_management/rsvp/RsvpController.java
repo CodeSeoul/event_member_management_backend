@@ -16,16 +16,12 @@ import org.codeseoul.event_member_management.member.MemberRepository;
 import org.codeseoul.event_member_management.rsvp_state.RsvpState;
 import org.codeseoul.event_member_management.rsvp_state.RsvpStateNotFoundException;
 import org.codeseoul.event_member_management.rsvp_state.RsvpStateRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class RsvpController {
-
-  private static final Logger log = LoggerFactory.getLogger(RsvpController.class);
 
   private final RsvpRepository repository;
   private final RsvpModelAssembler assembler;

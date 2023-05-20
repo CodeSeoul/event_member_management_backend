@@ -60,11 +60,11 @@ public class Event extends Auditable {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (!(o instanceof Event Event)) return false;
-    return Objects.equals(this.id, Event.id)
-        && Objects.equals(this.title, Event.title)
-        && Objects.equals(this.startTimestamp, Event.startTimestamp)
-        && Objects.equals(this.durationMinutes, Event.durationMinutes);
+    if (!(o instanceof Event event)) return false;
+    return Objects.equals(this.id, event.id)
+        && Objects.equals(this.title, event.title)
+        && Objects.equals(this.startTimestamp, event.startTimestamp)
+        && Objects.equals(this.durationMinutes, event.durationMinutes);
   }
 
   @Override

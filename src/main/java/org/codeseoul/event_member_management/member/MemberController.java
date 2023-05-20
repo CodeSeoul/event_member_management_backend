@@ -20,8 +20,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class MemberController {
 
-  // private static final Logger log = LoggerFactory.getLogger(MemberController.class);
-
   private final MemberRepository repository;
   private final MemberModelAssembler assembler;
 
@@ -67,7 +65,9 @@ public class MemberController {
 
   @DeleteMapping("/members/{id}")
   void deleteMember(@PathVariable Long id) {
-    repository.findById(id).orElseThrow(() -> new MemberNotFoundException(id));
+    if (!repository.existsById(id)) {
+      throw new MemberNotFoundException(id);
+    }
     repository.deleteById(id);
   }
 

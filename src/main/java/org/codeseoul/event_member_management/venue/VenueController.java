@@ -6,16 +6,12 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class VenueController {
-
-  private static final Logger log = LoggerFactory.getLogger(VenueController.class);
 
   private final VenueRepository repository;
   private final VenueModelAssembler assembler;
