@@ -5,6 +5,11 @@
       "type": "java.lang.String",
       "defaultValue": false,
       "description": "Whether or not to provide seed data in the database. Only useful for local development. Make sure to clean the DB between runs."
+    },
+    {
+      "name": "app.cors-allowed-origins",
+      "type": "java.lang.String[]",
+      "description": "A comma-separated list of origins to allow for CORS."
     }
   ]
 }
