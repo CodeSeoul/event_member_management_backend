@@ -1,81 +1,83 @@
+/* CodeSeoul (C) 2023 */
 package org.codeseoul.event_member_management.member;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.*;
+import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.codeseoul.event_member_management.common.Auditable;
 import org.codeseoul.event_member_management.rsvp.Rsvp;
 import org.codeseoul.event_member_management.sns_account.SnsAccount;
 
-import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-
-import java.util.*;
-
 @Entity
 @NoArgsConstructor
 @Data
 public class Member extends Auditable {
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private @Id
-    @GeneratedValue Long id;
+  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+  private @Id @GeneratedValue Long id;
 
-    @NotBlank
-    @Column(unique = true)
-    private String username;
+  @NotBlank
+  @Column(unique = true)
+  private String username;
 
-    private String displayName;
+  private String displayName;
 
-    @Email
-    @NotBlank
-    @Column(unique = true)
-    private String email;
+  @Email
+  @NotBlank
+  @Column(unique = true)
+  private String email;
 
-    @NotBlank
-    @Column(unique = true)
-    private String phoneNumber;
-    
-    private String imageUrl;
-    private String shortBio;
+  @NotBlank
+  @Column(unique = true)
+  private String phoneNumber;
 
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-    @JsonManagedReference(value="rsvp-member")
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Set<Rsvp> rsvps = new HashSet<>();
+  private String imageUrl;
+  private String shortBio;
 
-    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private List<SnsAccount> snsAccounts = new ArrayList<>();
+  @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+  @JsonManagedReference(value = "rsvp-member")
+  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+  private Set<Rsvp> rsvps = new HashSet<>();
 
-    public Member(String username, String displayName, String email, String phoneNumber, String imageUrl, String shortBio) {
-        this.username = username;
-        this.displayName = displayName;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.imageUrl = imageUrl;
-        this.shortBio = shortBio;
-    }
+  @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
+  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+  private List<SnsAccount> snsAccounts = new ArrayList<>();
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof Member member))
-            return false;
-        return Objects.equals(this.id, member.id)
-                && Objects.equals(this.username, member.username)
-                && Objects.equals(this.email, member.email);
-    }
+  public Member(
+      String username,
+      String displayName,
+      String email,
+      String phoneNumber,
+      String imageUrl,
+      String shortBio) {
+    this.username = username;
+    this.displayName = displayName;
+    this.email = email;
+    this.phoneNumber = phoneNumber;
+    this.imageUrl = imageUrl;
+    this.shortBio = shortBio;
+  }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.id, this.username, this.email);
-    }
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof Member member)) return false;
+    return Objects.equals(this.id, member.id)
+        && Objects.equals(this.username, member.username)
+        && Objects.equals(this.email, member.email);
+  }
 
-    @Override
-    public String toString() {
-        return "Member{" + "id=" + this.id + ", username='" + this.username + "'}";
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(this.id, this.username, this.email);
+  }
+
+  @Override
+  public String toString() {
+    return "Member{" + "id=" + this.id + ", username='" + this.username + "'}";
+  }
 }

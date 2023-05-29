@@ -1,3 +1,4 @@
+/* CodeSeoul (C) 2023 */
 package org.codeseoul.event_member_management.sns_account;
 
 import org.springframework.http.HttpStatus;
@@ -9,10 +10,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ControllerAdvice
 public class SnsAccountNotFoundAdvice {
 
-    @ResponseBody
-    @ExceptionHandler(SnsAccountNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    String snsAccountNotFoundHandler(SnsAccountNotFoundException ex) {
-        return ex.getMessage();
-    }
+  @ResponseBody
+  @ExceptionHandler(SnsAccountNotFoundException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  String snsAccountNotFoundHandler(SnsAccountNotFoundException ex) {
+    return ex.getMessage();
+  }
 }

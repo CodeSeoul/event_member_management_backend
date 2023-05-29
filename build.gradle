@@ -1,8 +1,11 @@
 plugins {
-	id 'org.springframework.boot' version '2.7.0'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-	id 'org.asciidoctor.convert' version '1.5.8'
-	id 'java'
+  id 'org.springframework.boot' version '2.7.0'
+  id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+  id 'org.asciidoctor.convert' version '1.5.8'
+  id 'com.diffplug.spotless' version '6.18.0'
+  id 'net.ltgt.errorprone' version '3.1.0'
+  id 'net.ltgt.nullaway' version '1.6.0'
+  id 'java'
 }
 
 group = 'org.codeseoul'
@@ -10,56 +13,102 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+  compileOnly {
+    extendsFrom annotationProcessor
+  }
 }
 
 repositories {
-	mavenCentral()
+  mavenCentral()
 }
 
 ext {
-	set('snippetsDir', file("build/generated-snippets"))
+  set('snippetsDir', file("build/generated-snippets"))
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+  implementation 'org.springframework.boot:spring-boot-starter-actuator'
+  implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+  implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 //	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
-	implementation 'org.springframework.boot:spring-boot-starter-hateoas'
-	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
-	implementation 'org.springframework.boot:spring-boot-starter-jersey'
+  implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+  implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+  implementation 'org.springframework.boot:spring-boot-starter-jersey'
 //	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 //	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springdoc:springdoc-openapi-webmvc-core:1.6.9'
-	implementation 'org.springdoc:springdoc-openapi-ui:1.6.9'
-	implementation 'org.springdoc:springdoc-openapi-hateoas:1.6.9'
-	implementation 'org.springdoc:springdoc-openapi-data-rest:1.6.9'
+  implementation 'org.springdoc:springdoc-openapi-webmvc-core:1.6.9'
+  implementation 'org.springdoc:springdoc-openapi-ui:1.6.9'
+  implementation 'org.springdoc:springdoc-openapi-hateoas:1.6.9'
+  implementation 'org.springdoc:springdoc-openapi-data-rest:1.6.9'
 //	implementation 'org.springdoc:springdoc-openapi-security:1.6.9'
-	compileOnly 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
-	runtimeOnly 'org.postgresql:postgresql'
-	annotationProcessor 'org.projectlombok:lombok'
-	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'com.h2database:h2'
-	testImplementation 'org.springframework.restdocs:spring-restdocs-webtestclient'
+  compileOnly 'org.projectlombok:lombok'
+  compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+  developmentOnly 'org.springframework.boot:spring-boot-devtools'
+  runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+  runtimeOnly 'org.postgresql:postgresql'
+  annotationProcessor 'org.projectlombok:lombok'
+  annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+  annotationProcessor 'com.uber.nullaway:nullaway:0.10.10'
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation 'com.h2database:h2'
+  testImplementation 'org.springframework.restdocs:spring-restdocs-webtestclient'
 //	testImplementation 'org.springframework.security:spring-security-test'
+  errorprone 'com.google.errorprone:error_prone_core:2.19.1'
+  errorprone 'com.uber.nullaway:nullaway:0.10.10'
+  errorproneJavac 'com.google.errorprone:javac:9+181-r4173-1'
 }
 
 tasks.withType(Test).configureEach {
-	outputs.dir snippetsDir
-	useJUnitPlatform()
+  outputs.dir snippetsDir
+  useJUnitPlatform()
 }
 
 tasks.named('asciidoctor') {
-	inputs.dir snippetsDir
-	dependsOn test
+  inputs.dir snippetsDir
+  dependsOn test
 }
 
 tasks.named('compileJava') {
-	inputs.files(tasks.named('processResources'))
+  inputs.files(tasks.named('processResources'))
+}
+
+import net.ltgt.gradle.errorprone.CheckSeverity
+
+tasks.withType(JavaCompile).configureEach {
+  options.errorprone.disableWarningsInGeneratedCode = true
+
+  options.errorprone.nullaway {
+    error()
+  }
+}
+
+nullaway {
+  annotatedPackages.add("net.ltgt")
+}
+
+spotless {
+  format 'misc', {
+    // define the files to apply `misc` to
+    target '*.gradle', '*.md', '.gitignore', '*.yaml', '*.properties', '*.json'
+
+    // define the steps to apply to those files
+    trimTrailingWhitespace()
+    indentWithSpaces(2)
+    endWithNewline()
+  }
+  java {
+    // Use the default importOrder configuration
+    importOrder()
+    removeUnusedImports()
+
+    // Cleanthat will refactor your code, but it may break your style: apply it before your formatter
+    cleanthat()          // has its own section below
+
+    // Choose one of these formatters.
+    googleJavaFormat()   // has its own section below
+
+    formatAnnotations()  // fixes formatting of type annotations, see below
+
+    licenseHeader '/* CodeSeoul (C) $YEAR */' // or licenseHeaderFile
+  }
 }
